@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 
 import 'model/home.dart';
+import 'model/refresh.dart';
 
 class FancyBottomBarPage extends StatefulWidget {
   static final String path = "lib/src/pages/misc/navybar.dart";
@@ -21,56 +23,61 @@ class _FancyBottomBarPageState extends State<FancyBottomBarPage> {
   int index = 0;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Bottom navigation fancy'),
+    return SafeArea(
+      child: Scaffold(
+        body: PageView(
+          physics: NeverScrollableScrollPhysics(),
+          onPageChanged: (index) {
+            indexcontroller.add(index);
+          },
+          controller: pageController,
+          children: <Widget>[
+            Center(child: Container(child: WebViewExample('https://immolist.ma/listings.php?category=10'))),
+
+            Center(child: Container(child: WebViewExample('https://immolist.ma'))),
+
+            Container(
+              child: HomePage1('https://immolist.ma/login.php'),
+            ),
+          ],
+        ),
+        bottomNavigationBar: StreamBuilder<Object>(
+            initialData: 0,
+            stream: indexcontroller.stream,
+            builder: (context, snapshot) {
+              int cIndex = snapshot.data;
+              return FancyBottomNavigation(
+                currentIndex: cIndex,
+                items: <FancyBottomNavigationItem>[
+                  FancyBottomNavigationItem(
+                      icon: Icon(Icons.search), title: Text('Affiner la recherche', style: GoogleFonts.lato(
+                    textStyle: Theme.of(context).textTheme.display1,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    fontStyle: FontStyle.italic,
+                  ),)),
+                  FancyBottomNavigationItem(
+                      icon: Icon(Icons.home), title: Text('Home', style: GoogleFonts.lato(
+                    textStyle: Theme.of(context).textTheme.display1,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    fontStyle: FontStyle.italic,
+                  ),)),
+                  FancyBottomNavigationItem(
+                      icon: Icon(Icons.person), title: Text('Login', style: GoogleFonts.lato(
+                    textStyle: Theme.of(context).textTheme.display1,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    fontStyle: FontStyle.italic,
+                  ),)),
+                ],
+                onItemSelected: (int value) {
+                  indexcontroller.add(value);
+                  pageController.jumpToPage(value);
+                },
+              );
+            }),
       ),
-      body: PageView(
-        physics: NeverScrollableScrollPhysics(),
-        onPageChanged: (index) {
-          indexcontroller.add(index);
-        },
-        controller: pageController,
-        children: <Widget>[
-          Center(
-            child: Container(
-              child: Column(
-
-              ),
-
-            )
-          ),
-          Container(
-            child:HomePage1(),
-          ),
-          Center(
-            child: Text('Security'),
-          ),
-
-        ],
-      ),
-      bottomNavigationBar: StreamBuilder<Object>(
-          initialData: 0,
-          stream: indexcontroller.stream,
-          builder: (context, snapshot) {
-            int cIndex = snapshot.data;
-            return FancyBottomNavigation(
-              currentIndex: cIndex,
-              items: <FancyBottomNavigationItem>[
-                FancyBottomNavigationItem(
-                    icon: Icon(Icons.home), title: Text('Home')),
-                FancyBottomNavigationItem(
-                    icon: Icon(Icons.person), title: Text('User')),
-                FancyBottomNavigationItem(
-                    icon: Icon(Icons.security), title: Text('Security')),
-
-              ],
-              onItemSelected: (int value) {
-                indexcontroller.add(value);
-                pageController.jumpToPage(value);
-              },
-            );
-          }),
     );
   }
 }
@@ -86,13 +93,13 @@ class FancyBottomNavigation extends StatefulWidget {
 
   FancyBottomNavigation(
       {Key key,
-        this.currentIndex = 0,
-        this.iconSize = 24,
-        this.activeColor,
-        this.inactiveColor,
-        this.backgroundColor,
-        @required this.items,
-        @required this.onItemSelected}) {
+      this.currentIndex = 0,
+      this.iconSize = 24,
+      this.activeColor,
+      this.inactiveColor,
+      this.backgroundColor,
+      @required this.items,
+      @required this.onItemSelected}) {
     assert(items != null);
     assert(onItemSelected != null);
   }
@@ -122,12 +129,12 @@ class _FancyBottomNavigationState extends State<FancyBottomNavigation> {
 
   _FancyBottomNavigationState(
       {@required this.items,
-        this.currentIndex,
-        this.activeColor,
-        this.inactiveColor = Colors.black,
-        this.backgroundColor,
-        this.iconSize,
-        @required this.onItemSelected}) {
+      this.currentIndex,
+      this.activeColor,
+      this.inactiveColor = Colors.black,
+      this.backgroundColor,
+      this.iconSize,
+      @required this.onItemSelected}) {
     _selectedIndex = currentIndex;
   }
 
@@ -140,9 +147,9 @@ class _FancyBottomNavigationState extends State<FancyBottomNavigation> {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        color: activeColor,
-        borderRadius: BorderRadius.all(Radius.circular(50)),
-      ),
+              color: activeColor,
+              borderRadius: BorderRadius.all(Radius.circular(50)),
+            ),
       child: ListView(
         shrinkWrap: true,
         padding: EdgeInsets.all(0),
@@ -164,9 +171,9 @@ class _FancyBottomNavigationState extends State<FancyBottomNavigation> {
               ),
               isSelected
                   ? DefaultTextStyle.merge(
-                style: TextStyle(color: backgroundColor),
-                child: item.title,
-              )
+                      style: TextStyle(color: backgroundColor),
+                      child: item.title,
+                    )
                   : SizedBox.shrink()
             ],
           )
@@ -178,7 +185,7 @@ class _FancyBottomNavigationState extends State<FancyBottomNavigation> {
   @override
   Widget build(BuildContext context) {
     activeColor =
-    (activeColor == null) ? Theme.of(context).accentColor : activeColor;
+        (activeColor == null) ? Theme.of(context).accentColor : activeColor;
 
     backgroundColor = (backgroundColor == null)
         ? Theme.of(context).bottomAppBarColor
